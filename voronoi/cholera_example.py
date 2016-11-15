@@ -81,8 +81,8 @@ def build_vor_polys(vor, soho_poly, pumps_xy):
 if __name__ == '__main__':
 
     # Pull in pump and death locations
-    pump_shps = shapefile.Reader("Pumps.shp")
-    death_shps = shapefile.Reader("Cholera_Deaths.shp")
+    pump_shps = shapefile.Reader("SnowGIS/Pumps.shp")
+    death_shps = shapefile.Reader("SnowGIS/Cholera_Deaths.shp")
 
     # Extract xy locations
     pumps_xy = np.array([s.points[0] for s in pump_shps.shapes()])
@@ -93,8 +93,8 @@ if __name__ == '__main__':
     # f = open('OSMap.tfw', 'rb')
 
     # Grayscale image
-    img = mpimg.imread('OSMap_Grayscale.tif')
-    f = open('OSMap_Grayscale.tfw', 'rb')
+    img = mpimg.imread('SnowGIS/OSMap_Grayscale.tif')
+    f = open('SnowGIS/OSMap_Grayscale.tfw', 'rb')
 
     # tfw file includes scaling information for the tiff image
     tfw_data = [float(line.rstrip('\n')) for line in f]
@@ -118,3 +118,5 @@ if __name__ == '__main__':
     for poly in polys:
         x, y = poly.exterior.xy
         plt.plot(x, y, color='#006600', alpha=0.7, linewidth=5, solid_capstyle='round', zorder=2)
+
+    plt.show()

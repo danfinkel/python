@@ -2,10 +2,10 @@ import numpy as np
 import matplotlib.pyplot as plt
 import matplotlib.image as mpimg
 import shapefile
-from scipy.spatial import Voronoi, voronoi_plot_2d
 import shapely.geometry as sg
-import shapely.geometry
-import shapely.ops
+
+from voronoi_library import voronoi, build_vor_polys
+
 
 """
 Plots with Voronoi overlays of 1854 Soho Cholera outbreak.
@@ -23,59 +23,6 @@ def build_soho_poly(bbox):
                [bbox[0], bbox[2]]])
     sohopoly = sg.Polygon(coords)
     return sohopoly
-
-
-def voronoi(towers, bounding_box):
-
-    # Mirror points
-    points_center = towers
-    points_left = np.copy(points_center)
-    points_left[:, 0] = bounding_box[0] - (points_left[:, 0] - bounding_box[0])
-    points_right = np.copy(points_center)
-    points_right[:, 0] = bounding_box[1] + (bounding_box[1] - points_right[:, 0])
-    points_down = np.copy(points_center)
-    points_down[:, 1] = bounding_box[2] - (points_down[:, 1] - bounding_box[2])
-    points_up = np.copy(points_center)
-    points_up[:, 1] = bounding_box[3] + (bounding_box[3] - points_up[:, 1])
-    points = np.append(points_center,
-                       np.append(np.append(points_left,
-                                           points_right,
-                                           axis=0),
-                                 np.append(points_down,
-                                           points_up,
-                                           axis=0),
-                                 axis=0),
-                       axis=0)
-    # Compute Voronoi
-    vor = Voronoi(points)
-    return vor
-
-
-def is_in(poly, pumps):
-    for s in pumps:
-        pt = sg.Point(s)
-        if poly.contains(pt):
-            return True
-    return False
-
-
-def build_vor_polys(vor, soho_poly, pumps_xy):
-
-    polys = []
-
-    # Build all lines in the voronoi region set
-    lines = [shapely.geometry.LineString(vor.vertices[line])
-            for line in vor.ridge_vertices
-            if -1 not in line]
-
-    # polygonize the lines and check if
-    # they are original or copies
-    for poly in shapely.ops.polygonize(lines):
-        if is_in(poly, pumps_xy):
-            poly = poly.intersection(soho_poly)
-            x, y = poly.exterior.xy
-            polys.append(poly)
-    return polys
 
 
 if __name__ == '__main__':
@@ -114,6 +61,7 @@ if __name__ == '__main__':
     vor = voronoi(pumps_xy, bbox)
     soho_poly = build_soho_poly(bbox)
     polys = build_vor_polys(vor, soho_poly, pumps_xy)
+
     # voronoi_plot_2d(vor)
     for poly in polys:
         x, y = poly.exterior.xy

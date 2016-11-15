@@ -1,6 +1,10 @@
 # -*- coding: utf-8 -*-
 """
     Standard geospatial coordinate tranformations
+    Included transforms:
+        enu --> geo
+        geo --> enu
+        haversine
 
     Created on Wed Apr 22 12:14:27 2015
     Author: Dan Finkel (dan.finkel@gmail.com)

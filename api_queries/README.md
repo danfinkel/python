@@ -1,1 +1,1 @@
-queries to open source apis
+Queries to open source apis

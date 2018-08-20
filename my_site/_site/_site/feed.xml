@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="3.8.3">Jekyll</generator><link href="https://danfinkel.github.io/feed.xml" rel="self" type="application/atom+xml" /><link href="https://danfinkel.github.io/" rel="alternate" type="text/html" /><updated>2018-08-20T14:48:02-04:00</updated><id>https://danfinkel.github.io/</id><title type="html">Dan Finkel’s Data Science Page</title><subtitle>Data Science, Analytics and Engineering Code Log.</subtitle><author><name>Dan Finkel</name><email>dan.finkel@gmail.com</email><uri>github.com/danfinkel</uri></author><entry><title type="html">Text Classification</title><link href="https://danfinkel.github.io/text_classification/" rel="alternate" type="text/html" title="Text Classification" /><published>2018-08-01T00:00:00-04:00</published><updated>2018-08-01T00:00:00-04:00</updated><id>https://danfinkel.github.io/text_classification</id><content type="html" xml:base="https://danfinkel.github.io/text_classification/">&lt;h2 id=&quot;text-classification-example&quot;&gt;Text Classification Example&lt;/h2&gt;
+
+&lt;p&gt;Coming Soon&lt;/p&gt;
+
+&lt;h1 id=&quot;an-h1-header&quot;&gt;An h1 header&lt;/h1&gt;
+
+&lt;p&gt;Paragraphs are separated by a blank line.&lt;/p&gt;
+
+&lt;p&gt;2nd paragraph. &lt;em&gt;Italic&lt;/em&gt;, &lt;strong&gt;bold&lt;/strong&gt;, and &lt;code class=&quot;highlighter-rouge&quot;&gt;monospace&lt;/code&gt;. Itemized lists
+look like:&lt;/p&gt;
+
+&lt;ul&gt;
+  &lt;li&gt;this one&lt;/li&gt;
+  &lt;li&gt;that one&lt;/li&gt;
+  &lt;li&gt;the other one&lt;/li&gt;
+&lt;/ul&gt;</content><author><name>danfinkel</name></author><summary type="html">Text Classification Example</summary><media:thumbnail xmlns:media="http://search.yahoo.com/mrss/" url="https://danfinkel.github.io/assets/images/wc_test.png" /></entry></feed>

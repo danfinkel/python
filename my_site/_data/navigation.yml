@@ -1,0 +1,10 @@
+# main links
+main:
+  - title: "About"
+    url: /about/
+  - title: "Resume"
+    url: /year-archive/
+  - title: "Some Photos"
+    url: /collection-archive/
+  - title: "Code Links"
+    url: /sitemap/

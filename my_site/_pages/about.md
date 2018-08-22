@@ -12,7 +12,16 @@ layouts_gallery:
   - url: /assets/images/all3kids.jpg
     image_path: /assets/images/all3kids.jpg
     alt: "archive layout example"
-last_modified_at: 2018-06-04T12:04:24-04:00
+
+hobbies_gallery:
+  - url: /assets/images/resume_wc.jpg
+    image_path: /assets/images/resume_wc.jpg
+    alt: "hfc striders"
+  - url: /assets/images/sillystring.jpg
+    image_path: /assets/images/sillystring.jpg
+    alt: "golf"
+
+last_modified_at: 2018-08-21
 toc: true
 ---
 
@@ -32,30 +41,27 @@ Dan is a data scientist living in the Greater Boston area. He has worked for the
 | Taxi Queues at LaGuardia Airport | Creating and validating a queue model Using public NYC taxi data | 
 | Voronoi Diagram Applications | Using Voronoi Partitions to evaluate retail locations | 
 
-For even more demo pages check the [posts archive][year-archive].
 
 ## Hobbies
 
 ---
 
-## Credits
+## Additional Links
 
-### Icons + Demo Images:
+### Jekyll / Web Design:
 
-- [The Noun Project](https://thenounproject.com) -- Garrett Knoll, Arthur Shlain, and [tracy tam](https://thenounproject.com/tracytam)
-- [Font Awesome](http://fontawesome.io/)
-- [Unsplash](https://unsplash.com/)
+- [Minimal Mistakes](https://mmistakes.github.io/minimal-mistakes/) -- Michael Rose's Jekyll Design Used for this page
+- [Markdown Resume](https://github.com/there4/markdown-resume) -- Markdown resume example
+- [Ink](https://github.com/thinker3197/ink) -- Another nice Jekyll design
+- [Zac Stewart](http://zacstewart.com/) -- A Blog with some great text analytics examples
+- [Jekyll](https://jekyllrb.com/) -- Jekyll for building your own io page
+- [Unsplash](https://unsplash.com/) -- Stock Photos
 
-### Other:
-- [Jekyll](https://jekyllrb.com/)
-- [jQuery](https://jquery.com/)
-- [Susy](http://susy.oddbird.net/)
-- [Breakpoint](http://breakpoint-sass.com/)
-- [Magnific Popup](http://dimsemenov.com/plugins/magnific-popup/)
-- [FitVids.JS](http://fitvidsjs.com/)
-- Greedy Navigation - [lukejacksonn](https://codepen.io/lukejacksonn/pen/PwmwWV)
-- [jQuery Smooth Scroll](https://github.com/kswedberg/jquery-smooth-scroll)
-- [Lunr](http://lunrjs.com)
+### Data Science and Analytics:
+- [Zac Stewart](http://zacstewart.com/) -- A Blog with some great text analytics examples
+- [Toward Data Science](https://towardsdatascience.com/) -- Good articles about current activity in data science
+- [Open Data Science](https://odsc.com/) -- Great series of data science conferences
+- [OR at NCSU](https://www.or.ncsu.edu/) -- You should go to school here.
 
 ---
 

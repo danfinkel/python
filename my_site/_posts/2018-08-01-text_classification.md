@@ -85,8 +85,13 @@ len(df_postest_genres['title'].unique())
 | Test    | Positive | 1,344         |
 | Test    | Negative | 2,982         |
 
+The genres themselves also have interesting attributes. The first chart shows raw counts of assigned movie genres across the 2,927 movies in the negative-reviews training folder.
 
 ![no-alignment](/assets/images/genre_breakout_neg_training_set.png)
+
+There are a lot of dramas and comedies in the dataset, some romance, action and sci-Fi movies and only a few Westerns, Documentaries and Sports-related films.
+
+Movies in the dataset can also have multiple genres attached to them. For example, according to IMDB, *Stanley & Iris* is classified as both a drama and a romance.
 
 ## Building an NLP Classifier
 

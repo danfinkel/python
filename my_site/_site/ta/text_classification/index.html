@@ -289,7 +289,7 @@
 
 
 
-  4 minute read
+  5 minute read
 </p>
           
         </header>
@@ -428,7 +428,25 @@
   </tbody>
 </table>
 
+<p>The genres themselves also have interesting attributes. The first chart shows raw counts of assigned movie genres across the 2,927 movies in the negative-reviews training folder.</p>
+
 <p><img src="/assets/images/genre_breakout_neg_training_set.png" alt="no-alignment" /></p>
+
+<p>There are a lot of dramas and comedies in the dataset, some romance, action and sci-Fi movies and only a few Westerns, Documentaries and Sports-related films.</p>
+
+<p>Movies in the dataset can also have multiple genres attached to them. For example, according to IMDB, <em>Stanley &amp; Iris</em> is classified as both a drama and a romance.</p>
+
+<p><img src="/assets/images/Drama_Romance.png" alt="image-left" class="align-left" /> IMDB-labeled movie genres overlap in a very intuitive way. For example, as shown to the left, a significant number of Romance movies are also Dramas. The converse is not as strong – i.e., there are a lot of drama movies that are not considered romances. This also seems intuitive – dramas can be much more than just romances.</p>
+
+<p>We can visualize the relationships between co-occurances of different genres with a clustermap</p>
+
+<p><img src="/assets/images/clustermap_negative_train.png" alt="no-alignment" /></p>
+
+<p>Once again the results are somewhat intuitive. The “Drama” genre co-occurs with many different smaller genres (strong co-occurances especially occur with “Sport” and “War”) while there are a few strong relationships to be seen (“News” and “Talk Show” for example).</p>
+
+<p>We can use this data to help us design the proper classification problem.</p>
+
+<p><img src="/assets/images/Drama_Comedy.png" alt="image-left" class="align-left" /> From the bar graph above we know there is plenty of reviews for “Drama” and “Comedy” movies. We can also see that their co-occurance isn’t overwhelming, i.e., only 277 movies in the negative set are labeled both “Comedy” and “Drama”. This provides a good starting problem – how well can we train a classifier to detect if a movie is a “Comedy” or a “Drama”?</p>
 
 <h2 id="building-an-nlp-classifier">Building an NLP Classifier</h2>
 
@@ -555,7 +573,7 @@ look like:</p>
 
 
 
-  4 minute read
+  5 minute read
 </p>
     
     <p class="archive__item-excerpt" itemprop="description">Text analysis is a continously growing application of data science that has many practical applications. At SMG we used data science to enhance many of our t...</p>

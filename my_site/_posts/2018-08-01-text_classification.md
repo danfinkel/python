@@ -91,7 +91,21 @@ The genres themselves also have interesting attributes. The first chart shows ra
 
 There are a lot of dramas and comedies in the dataset, some romance, action and sci-Fi movies and only a few Westerns, Documentaries and Sports-related films.
 
-Movies in the dataset can also have multiple genres attached to them. For example, according to IMDB, *Stanley & Iris* is classified as both a drama and a romance.
+Movies in the dataset can also have multiple genres attached to them. For example, according to IMDB, *Stanley & Iris* is classified as both a drama and a romance. 
+
+![image-left](/assets/images/Drama_Romance.png){: .align-left} IMDB-labeled movie genres overlap in a very intuitive way. For example, as shown to the left, a significant number of Romance movies are also Dramas. The converse is not as strong -- i.e., there are a lot of drama movies that are not considered romances. This also seems intuitive -- dramas can be much more than just romances.
+
+We can visualize the relationships between co-occurances of different genres with a clustermap
+
+![no-alignment](/assets/images/clustermap_negative_train.png)
+
+Once again the results are somewhat intuitive. The "Drama" genre co-occurs with many different smaller genres (strong co-occurances especially occur with "Sport" and "War") while there are a few strong relationships to be seen ("News" and "Talk Show" for example).
+
+We can use this data to help us design the proper classification problem. 
+
+![image-left](/assets/images/Drama_Comedy.png){: .align-left} From the bar graph above we know there is plenty of reviews for "Drama" and "Comedy" movies. We can also see that their co-occurance isn't overwhelming, i.e., only 277 movies in the negative set are labeled both "Comedy" and "Drama". This provides a good starting problem -- how well can we train a classifier to detect if a movie is a "Comedy" or a "Drama"?
+
+
 
 ## Building an NLP Classifier
 

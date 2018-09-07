@@ -1,8 +1,139 @@
-<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="3.8.3">Jekyll</generator><link href="https://danfinkel.github.io/feed.xml" rel="self" type="application/atom+xml" /><link href="https://danfinkel.github.io/" rel="alternate" type="text/html" /><updated>2018-08-20T14:48:02-04:00</updated><id>https://danfinkel.github.io/</id><title type="html">Dan Finkel’s Data Science Page</title><subtitle>Data Science, Analytics and Engineering Code Log.</subtitle><author><name>Dan Finkel</name><email>dan.finkel@gmail.com</email><uri>github.com/danfinkel</uri></author><entry><title type="html">Text Classification</title><link href="https://danfinkel.github.io/text_classification/" rel="alternate" type="text/html" title="Text Classification" /><published>2018-08-01T00:00:00-04:00</published><updated>2018-08-01T00:00:00-04:00</updated><id>https://danfinkel.github.io/text_classification</id><content type="html" xml:base="https://danfinkel.github.io/text_classification/">&lt;h2 id=&quot;text-classification-example&quot;&gt;Text Classification Example&lt;/h2&gt;
+<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="3.8.3">Jekyll</generator><link href="https://danfinkel.github.io/feed.xml" rel="self" type="application/atom+xml" /><link href="https://danfinkel.github.io/" rel="alternate" type="text/html" /><updated>2018-08-30T08:56:42-04:00</updated><id>https://danfinkel.github.io/</id><title type="html">Dan Finkel’s Data Science Page</title><subtitle>Data Science, Analytics and Engineering Code Log.</subtitle><author><name>Dan Finkel</name><email>dan.finkel@gmail.com</email><uri>github.com/danfinkel</uri></author><entry><title type="html">Determining Movie Genre from its Review</title><link href="https://danfinkel.github.io/ta/text_classification/" rel="alternate" type="text/html" title="Determining Movie Genre from its Review" /><published>2018-08-01T00:00:00-04:00</published><updated>2018-08-01T00:00:00-04:00</updated><id>https://danfinkel.github.io/ta/text_classification</id><content type="html" xml:base="https://danfinkel.github.io/ta/text_classification/">&lt;p&gt;Text analysis is a continously growing application of data science that has many practical applications. At SMG we used data science to enhance many of our text analytic services we provide for clients. We overhauled our sentiment classification processes, developed highly accurate detectors for significant TA occurances, prototyped trend detectors and forecasting models for text and built tools and processes to extract entity variants from our large datasets of survey comments.&lt;/p&gt;
 
-&lt;p&gt;Coming Soon&lt;/p&gt;
+&lt;p&gt;For this exercise let’s understand how much information about a movie genre is captured in review content. The code used to generate the content shown in this post can be found &lt;a href=&quot;https://github.com/danfinkel/python/tree/master/text_classification&quot;&gt;here&lt;/a&gt;.&lt;/p&gt;
 
-&lt;h1 id=&quot;an-h1-header&quot;&gt;An h1 header&lt;/h1&gt;
+&lt;h2 id=&quot;the-stanford-imdb-dataset&quot;&gt;The Stanford IMDB Dataset&lt;/h2&gt;
+
+&lt;p&gt;The AI lab at Stanford (&lt;a href=&quot;http://ai.stanford.edu&quot;&gt;SAIL&lt;/a&gt;) has done a lot cool stuff over the the years and provides a lot of services to the data science community (the &lt;a href=&quot;https://nlp.stanford.edu/projects/glove/&quot;&gt;GloVe word embeddings data set&lt;/a&gt; is just one good example).&lt;/p&gt;
+
+&lt;p&gt;For this exercise we are going to use the &lt;a href=&quot;http://ai.stanford.edu/~amaas/data/sentiment/&quot;&gt;Large Movie Review Dataset&lt;/a&gt; developed and hosted by the Stanford AI group. The dataset consists of 50,000 movie reviews that have been labeled positive and negative. Half of the reviews are labeled positive while half are labeled negative. The data is organized such that half the reviews are in a test folder and half in a training folder (so 12,500 reviews are positive-training, 12,500 are positive-negative, etc…). You can see the associated paper &lt;a href=&quot;http://www.aclweb.org/anthology/P11-1015&quot;&gt;here&lt;/a&gt;.&lt;/p&gt;
+
+&lt;h2 id=&quot;scraping-genre-from-imdb&quot;&gt;Scraping Genre from IMDB&lt;/h2&gt;
+
+&lt;p&gt;The Stanford review dataset has very little meta-data about the film being reviewed – the only information provided is a url to the films corresponding IMDB page. Fortunately in most cases that page has the films genre embedded in it. The code snippet below is used to extract the genre(s) of the film from its IMDB page.&lt;/p&gt;
+
+&lt;div class=&quot;language-python highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;        &lt;span class=&quot;c&quot;&gt;# request the html data&lt;/span&gt;
+        &lt;span class=&quot;c&quot;&gt;# need to remove excess url stuff&lt;/span&gt;
+        &lt;span class=&quot;n&quot;&gt;response&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;requests&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;get&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;row&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;1&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;][&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;'url'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;]&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;split&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;'/usercomments'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)[&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;0&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;])&lt;/span&gt;
+
+        &lt;span class=&quot;c&quot;&gt;# parse the text&lt;/span&gt;
+        &lt;span class=&quot;n&quot;&gt;soup&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;BeautifulSoup&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;response&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;text&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;'html.parser'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+
+        &lt;span class=&quot;c&quot;&gt;# genre data is in the script tag&lt;/span&gt;
+        &lt;span class=&quot;n&quot;&gt;scriptrows&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;soup&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;find_all&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;'script'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+        &lt;span class=&quot;k&quot;&gt;try&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;
+            &lt;span class=&quot;c&quot;&gt;# look in the first one&lt;/span&gt;
+            &lt;span class=&quot;n&quot;&gt;cand&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;r&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;for&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;r&lt;/span&gt; &lt;span class=&quot;ow&quot;&gt;in&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;scriptrows&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;if&lt;/span&gt; &lt;span class=&quot;nb&quot;&gt;str&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;r&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;split&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;'genre'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)[&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;0&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;]&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;!=&lt;/span&gt; &lt;span class=&quot;nb&quot;&gt;str&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;r&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)][&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;0&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;]&lt;/span&gt;    
+            &lt;span class=&quot;k&quot;&gt;try&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;
+                &lt;span class=&quot;c&quot;&gt;# multiple genres&lt;/span&gt;
+                &lt;span class=&quot;n&quot;&gt;genres&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;ast&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;literal_eval&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;nb&quot;&gt;str&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;cand&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;split&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;'genre'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)[&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;1&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;]&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;split&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;']'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)[&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;0&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;]&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;replace&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;&lt;/span&gt;&lt;span class=&quot;se&quot;&gt;\n&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;replace&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;'&quot;: ['&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;lstrip&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;()&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;rstrip&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;())&lt;/span&gt;
+            &lt;span class=&quot;k&quot;&gt;except&lt;/span&gt; &lt;span class=&quot;nb&quot;&gt;SyntaxError&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;
+                &lt;span class=&quot;c&quot;&gt;# hit an error&lt;/span&gt;
+                &lt;span class=&quot;c&quot;&gt;# because only one genre&lt;/span&gt;
+                &lt;span class=&quot;n&quot;&gt;genres&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;nb&quot;&gt;str&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;cand&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;split&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;'genre'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)[&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;1&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;]&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;split&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;','&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)[&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;0&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;]&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;replace&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;&lt;/span&gt;&lt;span class=&quot;se&quot;&gt;\n&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;replace&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;'&quot;:'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;lstrip&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;()&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;rstrip&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;()&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;replace&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;'&quot;'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;))&lt;/span&gt;
+
+            &lt;span class=&quot;c&quot;&gt;# grab the movie title&lt;/span&gt;
+            &lt;span class=&quot;n&quot;&gt;movie_title&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;soup&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;title&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;text&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;replace&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;' - IMDb'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;&quot;&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+
+            &lt;span class=&quot;c&quot;&gt;# record the data&lt;/span&gt;
+            &lt;span class=&quot;n&quot;&gt;movie_data&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;append&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;((&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;row&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;0&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;],&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;movie_title&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;genres&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;))&lt;/span&gt;
+        &lt;span class=&quot;k&quot;&gt;except&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;
+            &lt;span class=&quot;c&quot;&gt;# no genres found -- skip this entry&lt;/span&gt;
+            &lt;span class=&quot;k&quot;&gt;print&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;&quot;Error with &lt;/span&gt;&lt;span class=&quot;si&quot;&gt;%&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;i&quot;&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;%&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;row&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;0&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;]&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;The result is a dataframe indexed to the dataset that contains the title and genres of each reviewed film:&lt;/p&gt;
+
+&lt;table&gt;
+  &lt;thead&gt;
+    &lt;tr&gt;
+      &lt;th&gt;ref&lt;/th&gt;
+      &lt;th&gt;title&lt;/th&gt;
+      &lt;th&gt;genres&lt;/th&gt;
+    &lt;/tr&gt;
+  &lt;/thead&gt;
+  &lt;tbody&gt;
+    &lt;tr&gt;
+      &lt;td&gt;0&lt;/td&gt;
+      &lt;td&gt;Futz (1969)&lt;/td&gt;
+      &lt;td&gt;(Comedy)&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+      &lt;td&gt;1&lt;/td&gt;
+      &lt;td&gt;Stanley &amp;amp; Iris (1990)&lt;/td&gt;
+      &lt;td&gt;(Drama, Romance)&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+      &lt;td&gt;2&lt;/td&gt;
+      &lt;td&gt;Stanley &amp;amp; Iris (1990)&lt;/td&gt;
+      &lt;td&gt;(Drama, Romance)&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+      &lt;td&gt;3&lt;/td&gt;
+      &lt;td&gt;Stanley &amp;amp; Iris (1990)&lt;/td&gt;
+      &lt;td&gt;(Drama, Romance)&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+      &lt;td&gt;4&lt;/td&gt;
+      &lt;td&gt;The Mad Magician (1954)&lt;/td&gt;
+      &lt;td&gt;(Horror, Mystery, Thriller)&lt;/td&gt;
+    &lt;/tr&gt;
+  &lt;/tbody&gt;
+&lt;/table&gt;
+
+&lt;p&gt;You can see a couple of attributes stand out about the data. First, there are multiple reviews for the same movie. We can see this if we dig into the data. Here is the review for ref 2:&lt;/p&gt;
+
+&lt;blockquote&gt;
+  &lt;p&gt;I saw the capsule comment said “great acting.” In my opinion, these are two great actors giving horrible performances, and with zero chemistry with one another, for a great director in his all-time worst effort. Robert De Niro has to be the most ingenious and insightful illiterate of all time. Jane Fonda’s performance uncomfortably drifts all over the map as she clearly has no handle on this character, mostly because the character is so poorly written. Molasses-like would be too swift an adjective for this film’s excruciating pacing. Although the film’s intent is to be an uplifting story of curing illiteracy, watching it is a true “bummer.” I give it 1 out of 10, truly one of the worst 20 movies for its budget level that I have ever seen.&lt;/p&gt;
+&lt;/blockquote&gt;
+
+&lt;p&gt;And here is the review for ref 1:&lt;/p&gt;
+&lt;blockquote&gt;
+  &lt;p&gt;Robert DeNiro plays the most unbelievably intelligent illiterate of all time. This movie is so wasteful of talent, it is truly disgusting. The script is unbelievable. The dialog is unbelievable. Jane Fonda’s character is a caricature of herself, and not a funny one. The movie moves at a snail’s pace, is photographed in an ill-advised manner, and is insufferably preachy. It also plugs in every cliche in the book. Swoozie Kurtz is excellent in a supporting role, but so what?&lt;br /&gt;&lt;br /&gt;Equally annoying is this new IMDB rule of requiring ten lines for every review. When a movie is this worthless, it doesn’t require ten lines of text to let other readers know that it is a waste of time and tape. Avoid this movie.&lt;/p&gt;
+&lt;/blockquote&gt;
+
+&lt;p&gt;Digging a little further we can count the number of unique movies in each data set:&lt;/p&gt;
+
+&lt;div class=&quot;language-python highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;nb&quot;&gt;len&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;df_postest_genres&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;'title'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;]&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;unique&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;())&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;table&gt;
+  &lt;thead&gt;
+    &lt;tr&gt;
+      &lt;th&gt;Dataset&lt;/th&gt;
+      &lt;th&gt;Polarity&lt;/th&gt;
+      &lt;th&gt;Unique Movies&lt;/th&gt;
+    &lt;/tr&gt;
+  &lt;/thead&gt;
+  &lt;tbody&gt;
+    &lt;tr&gt;
+      &lt;td&gt;Train&lt;/td&gt;
+      &lt;td&gt;Positive&lt;/td&gt;
+      &lt;td&gt;1,382&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+      &lt;td&gt;Train&lt;/td&gt;
+      &lt;td&gt;Negative&lt;/td&gt;
+      &lt;td&gt;2,927&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+      &lt;td&gt;Test&lt;/td&gt;
+      &lt;td&gt;Positive&lt;/td&gt;
+      &lt;td&gt;1,344&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+      &lt;td&gt;Test&lt;/td&gt;
+      &lt;td&gt;Negative&lt;/td&gt;
+      &lt;td&gt;2,982&lt;/td&gt;
+    &lt;/tr&gt;
+  &lt;/tbody&gt;
+&lt;/table&gt;
+
+&lt;p&gt;&lt;img src=&quot;/assets/images/genre_breakout_neg_training_set.png&quot; alt=&quot;no-alignment&quot; /&gt;&lt;/p&gt;
+
+&lt;h2 id=&quot;building-an-nlp-classifier&quot;&gt;Building an NLP Classifier&lt;/h2&gt;
+
+&lt;h2 id=&quot;performance-results&quot;&gt;Performance Results&lt;/h2&gt;
 
 &lt;p&gt;Paragraphs are separated by a blank line.&lt;/p&gt;
 
@@ -13,4 +144,4 @@ look like:&lt;/p&gt;
   &lt;li&gt;this one&lt;/li&gt;
   &lt;li&gt;that one&lt;/li&gt;
   &lt;li&gt;the other one&lt;/li&gt;
-&lt;/ul&gt;</content><author><name>danfinkel</name></author><summary type="html">Text Classification Example</summary><media:thumbnail xmlns:media="http://search.yahoo.com/mrss/" url="https://danfinkel.github.io/assets/images/wc_test.png" /></entry></feed>
+&lt;/ul&gt;</content><author><name>Dan Finkel</name><email>dan.finkel@gmail.com</email><uri>github.com/danfinkel</uri></author><category term="IMDB" /><category term="Text" /><summary type="html">Text analysis is a continously growing application of data science that has many practical applications. At SMG we used data science to enhance many of our text analytic services we provide for clients. We overhauled our sentiment classification processes, developed highly accurate detectors for significant TA occurances, prototyped trend detectors and forecasting models for text and built tools and processes to extract entity variants from our large datasets of survey comments.</summary></entry></feed>

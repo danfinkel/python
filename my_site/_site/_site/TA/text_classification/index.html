@@ -1,0 +1,611 @@
+<!doctype html>
+<!--
+  Minimal Mistakes Jekyll Theme 4.12.1 by Michael Rose
+  Copyright 2013-2018 Michael Rose - mademistakes.com | @mmistakes
+  Free for personal and commercial use under the MIT license
+  https://github.com/mmistakes/minimal-mistakes/blob/master/LICENSE.txt
+-->
+<html lang="en" class="no-js">
+  <head>
+    <meta charset="utf-8">
+
+<!-- begin _includes/seo.html --><title>Determining Movie Genre from its Review - Dan Finkel’s Data Science Page</title>
+<meta name="description" content="Combining Features to Classify Text">
+
+
+
+<meta property="og:type" content="article">
+<meta property="og:locale" content="en_US">
+<meta property="og:site_name" content="Dan Finkel's Data Science Page">
+<meta property="og:title" content="Determining Movie Genre from its Review">
+<meta property="og:url" content="https://danfinkel.github.io/ta/text_classification/">
+
+
+  <meta property="og:description" content="Combining Features to Classify Text">
+
+
+
+  <meta property="og:image" content="https://danfinkel.github.io/assets/images/wc_test.png">
+
+
+
+
+
+  <meta property="article:published_time" content="2018-08-01T00:00:00-04:00">
+
+
+
+
+
+  
+
+  
+
+
+<link rel="canonical" href="https://danfinkel.github.io/ta/text_classification/">
+
+
+
+
+
+
+
+  <script type="application/ld+json">
+    {
+      "@context": "http://schema.org",
+      "@type": "Person",
+      "name": "Dan Finkel",
+      "url": "https://danfinkel.github.io",
+      "sameAs": null
+    }
+  </script>
+
+
+
+
+
+
+
+<!-- end _includes/seo.html -->
+
+
+<link href="/feed.xml" type="application/atom+xml" rel="alternate" title="Dan Finkel's Data Science Page Feed">
+
+<!-- http://t.co/dKP3o1e -->
+<meta name="HandheldFriendly" content="True">
+<meta name="MobileOptimized" content="320">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<script>
+  document.documentElement.className = document.documentElement.className.replace(/\bno-js\b/g, '') + ' js ';
+</script>
+
+<!-- For all browsers -->
+<link rel="stylesheet" href="/assets/css/main.css">
+
+<!--[if lte IE 9]>
+  <style>
+    /* old IE unsupported flexbox fixes */
+    .greedy-nav .site-title {
+      padding-right: 3em;
+    }
+    .greedy-nav button {
+      position: absolute;
+      top: 0;
+      right: 0;
+      height: 100%;
+    }
+  </style>
+<![endif]-->
+
+
+    <!-- start custom head snippets -->
+
+<!-- insert favicons. use https://realfavicongenerator.net/ -->
+
+<!-- end custom head snippets -->
+
+  </head>
+
+  <body class="layout--single">
+
+    <!--[if lt IE 9]>
+<div class="notice--danger align-center" style="margin: 0;">You are using an <strong>outdated</strong> browser. Please <a href="https://browsehappy.com/">upgrade your browser</a> to improve your experience.</div>
+<![endif]-->
+
+    <div class="masthead">
+  <div class="masthead__inner-wrap">
+    <div class="masthead__menu">
+      <nav id="site-nav" class="greedy-nav">
+        <a class="site-title" href="/">Dan Finkel's Data Science Page</a>
+        <ul class="visible-links"><li class="masthead__menu-item">
+              <a href="/about/" >About</a>
+            </li><li class="masthead__menu-item">
+              <a href="/resume/" >Resume</a>
+            </li><li class="masthead__menu-item">
+              <a href="/collection-archive/" >Some Photos</a>
+            </li><li class="masthead__menu-item">
+              <a href="/sitemap/" >Code Links</a>
+            </li></ul>
+        
+        <button class="greedy-nav__toggle hidden" type="button">
+          <span class="visually-hidden">Toggle menu</span>
+          <div class="navicon"></div>
+        </button>
+        <ul class="hidden-links hidden"></ul>
+      </nav>
+    </div>
+  </div>
+</div>
+
+
+    <div class="initial-content">
+      
+
+
+
+<div id="main" role="main">
+  
+  <div class="sidebar sticky">
+  
+
+
+<div itemscope itemtype="http://schema.org/Person">
+
+  
+    <div class="author__avatar">
+      
+
+      
+        <img src="/assets/images/bio_image.png" alt="Dan Finkel" itemprop="image">
+      
+    </div>
+  
+
+  <div class="author__content">
+    
+      <h3 class="author__name" itemprop="name">Dan Finkel</h3>
+    
+    
+      <p class="author__bio" itemprop="description">
+        Data Scientist and Engineer
+      </p>
+    
+  </div>
+
+  <div class="author__urls-wrapper">
+    <button class="btn btn--inverse">Follow</button>
+    <ul class="author__urls social-icons">
+      
+        <li itemprop="homeLocation" itemscope itemtype="http://schema.org/Place">
+          <i class="fas fa-fw fa-map-marker-alt" aria-hidden="true"></i> <span itemprop="name">Dedham MA</span>
+        </li>
+      
+
+      
+        <li>
+          <a href="github.com/danfinkel" itemprop="url">
+            <i class="fas fa-fw fa-link" aria-hidden="true"></i> Website
+          </a>
+        </li>
+      
+
+      
+        <li>
+          <a href="mailto:dan.finkel@gmail.com">
+            <meta itemprop="email" content="dan.finkel@gmail.com" />
+            <i class="fas fa-fw fa-envelope-square" aria-hidden="true"></i> Email
+          </a>
+        </li>
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+        <li>
+          <a href="https://www.linkedin.com/in/daniel-finkel-8217908" itemprop="sameAs">
+            <i class="fab fa-fw fa-linkedin" aria-hidden="true"></i> LinkedIn
+          </a>
+        </li>
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+        <li>
+          <a href="https://github.com/danfinkel" itemprop="sameAs">
+            <i class="fab fa-fw fa-github" aria-hidden="true"></i> GitHub
+          </a>
+        </li>
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      <!--
+  <li>
+    <a href="http://link-to-whatever-social-network.com/user/" itemprop="sameAs">
+      <i class="fas fa-fw" aria-hidden="true"></i> Custom Social Profile Link
+    </a>
+  </li>
+-->
+    </ul>
+  </div>
+</div>
+
+  
+  </div>
+
+
+  <article class="page" itemscope itemtype="http://schema.org/CreativeWork">
+    <meta itemprop="headline" content="Determining Movie Genre from its Review">
+    <meta itemprop="description" content="Text analysis is a continously growing application of data science that has many practical applications. At SMG we used data science to enhance many of our text analytic services we provide for clients. We overhauled our sentiment classification processes, developed highly accurate detectors for significant TA occurances, prototyped trend detectors and forecasting models for text and built tools and processes to extract entity variants from our large datasets of survey comments.">
+    <meta itemprop="datePublished" content="August 01, 2018">
+    
+
+    <div class="page__inner-wrap">
+      
+        <header>
+          <h1 id="page-title" class="page__title" itemprop="headline">Determining Movie Genre from its Review
+</h1>
+          
+            <p class="page__meta"><i class="far fa-clock" aria-hidden="true"></i> 
+
+
+
+
+  4 minute read
+</p>
+          
+        </header>
+      
+
+      <section class="page__content" itemprop="text">
+        
+        <p>Text analysis is a continously growing application of data science that has many practical applications. At SMG we used data science to enhance many of our text analytic services we provide for clients. We overhauled our sentiment classification processes, developed highly accurate detectors for significant TA occurances, prototyped trend detectors and forecasting models for text and built tools and processes to extract entity variants from our large datasets of survey comments.</p>
+
+<p>For this exercise let’s understand how much information about a movie genre is captured in review content. The code used to generate the content shown in this post can be found <a href="https://github.com/danfinkel/python/tree/master/text_classification">here</a>.</p>
+
+<h2 id="the-stanford-imdb-dataset">The Stanford IMDB Dataset</h2>
+
+<p>The AI lab at Stanford (<a href="http://ai.stanford.edu">SAIL</a>) has done a lot cool stuff over the the years and provides a lot of services to the data science community (the <a href="https://nlp.stanford.edu/projects/glove/">GloVe word embeddings data set</a> is just one good example).</p>
+
+<p>For this exercise we are going to use the <a href="http://ai.stanford.edu/~amaas/data/sentiment/">Large Movie Review Dataset</a> developed and hosted by the Stanford AI group. The dataset consists of 50,000 movie reviews that have been labeled positive and negative. Half of the reviews are labeled positive while half are labeled negative. The data is organized such that half the reviews are in a test folder and half in a training folder (so 12,500 reviews are positive-training, 12,500 are positive-negative, etc…). You can see the associated paper <a href="http://www.aclweb.org/anthology/P11-1015">here</a>.</p>
+
+<h2 id="scraping-genre-from-imdb">Scraping Genre from IMDB</h2>
+
+<p>The Stanford review dataset has very little meta-data about the film being reviewed – the only information provided is a url to the films corresponding IMDB page. Fortunately in most cases that page has the films genre embedded in it. The code snippet below is used to extract the genre(s) of the film from its IMDB page.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code>        <span class="c"># request the html data</span>
+        <span class="c"># need to remove excess url stuff</span>
+        <span class="n">response</span> <span class="o">=</span> <span class="n">requests</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">row</span><span class="p">[</span><span class="mi">1</span><span class="p">][</span><span class="s">'url'</span><span class="p">]</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s">'/usercomments'</span><span class="p">)[</span><span class="mi">0</span><span class="p">])</span>
+
+        <span class="c"># parse the text</span>
+        <span class="n">soup</span> <span class="o">=</span> <span class="n">BeautifulSoup</span><span class="p">(</span><span class="n">response</span><span class="o">.</span><span class="n">text</span><span class="p">,</span> <span class="s">'html.parser'</span><span class="p">)</span>
+
+        <span class="c"># genre data is in the script tag</span>
+        <span class="n">scriptrows</span> <span class="o">=</span> <span class="n">soup</span><span class="o">.</span><span class="n">find_all</span><span class="p">(</span><span class="s">'script'</span><span class="p">)</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="c"># look in the first one</span>
+            <span class="n">cand</span> <span class="o">=</span> <span class="p">[</span><span class="n">r</span> <span class="k">for</span> <span class="n">r</span> <span class="ow">in</span> <span class="n">scriptrows</span> <span class="k">if</span> <span class="nb">str</span><span class="p">(</span><span class="n">r</span><span class="p">)</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s">'genre'</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span> <span class="o">!=</span> <span class="nb">str</span><span class="p">(</span><span class="n">r</span><span class="p">)][</span><span class="mi">0</span><span class="p">]</span>    
+            <span class="k">try</span><span class="p">:</span>
+                <span class="c"># multiple genres</span>
+                <span class="n">genres</span> <span class="o">=</span> <span class="n">ast</span><span class="o">.</span><span class="n">literal_eval</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">cand</span><span class="p">)</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s">'genre'</span><span class="p">)[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s">']'</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s">"</span><span class="se">\n</span><span class="s">"</span><span class="p">,</span><span class="s">""</span><span class="p">)</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s">'": ['</span><span class="p">,</span><span class="s">""</span><span class="p">)</span><span class="o">.</span><span class="n">lstrip</span><span class="p">()</span><span class="o">.</span><span class="n">rstrip</span><span class="p">())</span>
+            <span class="k">except</span> <span class="nb">SyntaxError</span><span class="p">:</span>
+                <span class="c"># hit an error</span>
+                <span class="c"># because only one genre</span>
+                <span class="n">genres</span> <span class="o">=</span> <span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">cand</span><span class="p">)</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s">'genre'</span><span class="p">)[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s">','</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s">"</span><span class="se">\n</span><span class="s">"</span><span class="p">,</span><span class="s">""</span><span class="p">)</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s">'":'</span><span class="p">,</span><span class="s">""</span><span class="p">)</span><span class="o">.</span><span class="n">lstrip</span><span class="p">()</span><span class="o">.</span><span class="n">rstrip</span><span class="p">()</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s">'"'</span><span class="p">,</span><span class="s">""</span><span class="p">))</span>
+
+            <span class="c"># grab the movie title</span>
+            <span class="n">movie_title</span> <span class="o">=</span> <span class="n">soup</span><span class="o">.</span><span class="n">title</span><span class="o">.</span><span class="n">text</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s">' - IMDb'</span><span class="p">,</span> <span class="s">""</span><span class="p">)</span>
+
+            <span class="c"># record the data</span>
+            <span class="n">movie_data</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="n">row</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">movie_title</span><span class="p">,</span> <span class="n">genres</span><span class="p">))</span>
+        <span class="k">except</span><span class="p">:</span>
+            <span class="c"># no genres found -- skip this entry</span>
+            <span class="k">print</span> <span class="s">"Error with </span><span class="si">%</span><span class="s">i"</span> <span class="o">%</span> <span class="n">row</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+</code></pre></div></div>
+
+<p>The result is a dataframe indexed to the dataset that contains the title and genres of each reviewed film:</p>
+
+<table>
+  <thead>
+    <tr>
+      <th>ref</th>
+      <th>title</th>
+      <th>genres</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>0</td>
+      <td>Futz (1969)</td>
+      <td>(Comedy)</td>
+    </tr>
+    <tr>
+      <td>1</td>
+      <td>Stanley &amp; Iris (1990)</td>
+      <td>(Drama, Romance)</td>
+    </tr>
+    <tr>
+      <td>2</td>
+      <td>Stanley &amp; Iris (1990)</td>
+      <td>(Drama, Romance)</td>
+    </tr>
+    <tr>
+      <td>3</td>
+      <td>Stanley &amp; Iris (1990)</td>
+      <td>(Drama, Romance)</td>
+    </tr>
+    <tr>
+      <td>4</td>
+      <td>The Mad Magician (1954)</td>
+      <td>(Horror, Mystery, Thriller)</td>
+    </tr>
+  </tbody>
+</table>
+
+<p>You can see a couple of attributes stand out about the data. First, there are multiple reviews for the same movie. We can see this if we dig into the data. Here is the review for ref 2:</p>
+
+<blockquote>
+  <p>I saw the capsule comment said “great acting.” In my opinion, these are two great actors giving horrible performances, and with zero chemistry with one another, for a great director in his all-time worst effort. Robert De Niro has to be the most ingenious and insightful illiterate of all time. Jane Fonda’s performance uncomfortably drifts all over the map as she clearly has no handle on this character, mostly because the character is so poorly written. Molasses-like would be too swift an adjective for this film’s excruciating pacing. Although the film’s intent is to be an uplifting story of curing illiteracy, watching it is a true “bummer.” I give it 1 out of 10, truly one of the worst 20 movies for its budget level that I have ever seen.</p>
+</blockquote>
+
+<p>And here is the review for ref 1:</p>
+<blockquote>
+  <p>Robert DeNiro plays the most unbelievably intelligent illiterate of all time. This movie is so wasteful of talent, it is truly disgusting. The script is unbelievable. The dialog is unbelievable. Jane Fonda’s character is a caricature of herself, and not a funny one. The movie moves at a snail’s pace, is photographed in an ill-advised manner, and is insufferably preachy. It also plugs in every cliche in the book. Swoozie Kurtz is excellent in a supporting role, but so what?<br /><br />Equally annoying is this new IMDB rule of requiring ten lines for every review. When a movie is this worthless, it doesn’t require ten lines of text to let other readers know that it is a waste of time and tape. Avoid this movie.</p>
+</blockquote>
+
+<p>Digging a little further we can count the number of unique movies in each data set:</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nb">len</span><span class="p">(</span><span class="n">df_postest_genres</span><span class="p">[</span><span class="s">'title'</span><span class="p">]</span><span class="o">.</span><span class="n">unique</span><span class="p">())</span>
+</code></pre></div></div>
+
+<table>
+  <thead>
+    <tr>
+      <th>Dataset</th>
+      <th>Polarity</th>
+      <th>Unique Movies</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>Train</td>
+      <td>Positive</td>
+      <td>1,382</td>
+    </tr>
+    <tr>
+      <td>Train</td>
+      <td>Negative</td>
+      <td>2,927</td>
+    </tr>
+    <tr>
+      <td>Test</td>
+      <td>Positive</td>
+      <td>1,344</td>
+    </tr>
+    <tr>
+      <td>Test</td>
+      <td>Negative</td>
+      <td>2,982</td>
+    </tr>
+  </tbody>
+</table>
+
+<p><img src="/assets/images/genre_breakout_neg_training_set.png" alt="no-alignment" /></p>
+
+<h2 id="building-an-nlp-classifier">Building an NLP Classifier</h2>
+
+<h2 id="performance-results">Performance Results</h2>
+
+<p>Paragraphs are separated by a blank line.</p>
+
+<p>2nd paragraph. <em>Italic</em>, <strong>bold</strong>, and <code class="highlighter-rouge">monospace</code>. Itemized lists
+look like:</p>
+
+<ul>
+  <li>this one</li>
+  <li>that one</li>
+  <li>the other one</li>
+</ul>
+
+
+        
+      </section>
+
+      <footer class="page__meta">
+        
+        
+  
+
+
+  
+  
+  
+
+  <p class="page__taxonomy">
+    <strong><i class="fas fa-fw fa-tags" aria-hidden="true"></i> Tags: </strong>
+    <span itemprop="keywords">
+    
+      
+      
+      <a href="/tags/#imdb" class="page__taxonomy-item" rel="tag">IMDB</a><span class="sep">, </span>
+    
+      
+      
+      <a href="/tags/#text" class="page__taxonomy-item" rel="tag">Text</a>
+    
+    </span>
+  </p>
+
+
+
+
+  
+
+
+  
+  
+  
+
+  <p class="page__taxonomy">
+    <strong><i class="fas fa-fw fa-folder-open" aria-hidden="true"></i> Categories: </strong>
+    <span itemprop="keywords">
+    
+      
+      
+      <a href="/categories/#ta" class="page__taxonomy-item" rel="tag">TA</a>
+    
+    </span>
+  </p>
+
+
+        
+          <p class="page__date"><strong><i class="fas fa-fw fa-calendar-alt" aria-hidden="true"></i> Updated:</strong> <time datetime="2018-08-01T00:00:00-04:00">August 01, 2018</time></p>
+        
+      </footer>
+
+      <section class="page__share">
+  
+    <h4 class="page__share-title">Share on</h4>
+  
+
+  <a href="https://twitter.com/intent/tweet?text=Determining+Movie+Genre+from+its+Review%20https%3A%2F%2Fdanfinkel.github.io%2Fta%2Ftext_classification%2F" class="btn btn--twitter" onclick="window.open(this.href, 'window', 'left=20,top=20,width=500,height=500,toolbar=1,resizable=0'); return false;" title="Share on Twitter"><i class="fab fa-fw fa-twitter" aria-hidden="true"></i><span> Twitter</span></a>
+
+  <a href="https://www.facebook.com/sharer/sharer.php?u=https%3A%2F%2Fdanfinkel.github.io%2Fta%2Ftext_classification%2F" class="btn btn--facebook" onclick="window.open(this.href, 'window', 'left=20,top=20,width=500,height=500,toolbar=1,resizable=0'); return false;" title="Share on Facebook"><i class="fab fa-fw fa-facebook" aria-hidden="true"></i><span> Facebook</span></a>
+
+  <a href="https://plus.google.com/share?url=https%3A%2F%2Fdanfinkel.github.io%2Fta%2Ftext_classification%2F" class="btn btn--google-plus" onclick="window.open(this.href, 'window', 'left=20,top=20,width=500,height=500,toolbar=1,resizable=0'); return false;" title="Share on Google Plus"><i class="fab fa-fw fa-google-plus" aria-hidden="true"></i><span> Google+</span></a>
+
+  <a href="https://www.linkedin.com/shareArticle?mini=true&url=https%3A%2F%2Fdanfinkel.github.io%2Fta%2Ftext_classification%2F" class="btn btn--linkedin" onclick="window.open(this.href, 'window', 'left=20,top=20,width=500,height=500,toolbar=1,resizable=0'); return false;" title="Share on LinkedIn"><i class="fab fa-fw fa-linkedin" aria-hidden="true"></i><span> LinkedIn</span></a>
+</section>
+
+
+      
+    </div>
+
+    
+  </article>
+
+  
+  
+    <div class="page__related">
+      <h4 class="page__related-title">You may also enjoy</h4>
+      <div class="grid__wrapper">
+        
+          
+
+
+
+<div class="grid__item">
+  <article class="archive__item" itemscope itemtype="http://schema.org/CreativeWork">
+    
+      <div class="archive__item-teaser">
+        <img src=
+          
+            "/assets/images/wc_test.png"
+          
+          alt="">
+      </div>
+    
+    <h2 class="archive__item-title" itemprop="headline">
+      
+        <a href="/ta/text_classification/" rel="permalink">Determining Movie Genre from its Review
+</a>
+      
+    </h2>
+    
+      <p class="page__meta"><i class="far fa-clock" aria-hidden="true"></i> 
+
+
+
+
+  4 minute read
+</p>
+    
+    <p class="archive__item-excerpt" itemprop="description">Text analysis is a continously growing application of data science that has many practical applications. At SMG we used data science to enhance many of our t...</p>
+  </article>
+</div>
+        
+      </div>
+    </div>
+  
+</div>
+    </div>
+
+    
+
+    <div class="page__footer">
+      <footer>
+        <!-- start custom footer snippets -->
+
+<!-- end custom footer snippets -->
+        <div class="page__footer-follow">
+  <ul class="social-icons">
+    
+      <li><strong>Follow:</strong></li>
+    
+    
+    
+    
+      <li><a href="https://github.com/danfinkel"><i class="fab fa-fw fa-github" aria-hidden="true"></i> GitHub</a></li>
+    
+    
+    
+    <li><a href="/feed.xml"><i class="fas fa-fw fa-rss-square" aria-hidden="true"></i> Feed</a></li>
+  </ul>
+</div>
+
+<div class="page__footer-copyright">&copy; 2018 Dan Finkel. Powered by <a href="https://jekyllrb.com" rel="nofollow">Jekyll</a> &amp; <a href="https://mademistakes.com/work/minimal-mistakes-jekyll-theme/" rel="nofollow">Minimal Mistakes</a>.</div>
+
+      </footer>
+    </div>
+
+    
+  <script src="/assets/js/main.min.js"></script>
+  <script src="https://use.fontawesome.com/releases/v5.2.0/js/all.js"></script>
+
+
+
+
+
+
+
+
+  </body>
+</html>

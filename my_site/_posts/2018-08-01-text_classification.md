@@ -105,18 +105,82 @@ We can use this data to help us design the proper classification problem.
 
 ![image-left](/assets/images/Drama_Comedy.png){: .align-left} From the bar graph above we know there is plenty of reviews for "Drama" and "Comedy" movies. We can also see that their co-occurance isn't overwhelming, i.e., only 277 movies in the negative set are labeled both "Comedy" and "Drama". This provides a good starting problem -- how well can we train a classifier to detect if a movie is a "Comedy" or a "Drama"?
 
-
-
 ## Building an NLP Classifier
+
+For this exercise we are going to look at the performance of binary classifiers, i.e., how well a classifier labels a movie with a given genre. This aligns well with the dataset since a movie can have multiple labels. For example, "Die Hard" is both an [Action and Thriller](https://www.imdb.com/title/tt0095016/). A production-version design of this application could be a "bank" of binary classifiers, each one trying to determine if a given movie should be labeled with a specific genre.
+
+To start lets consider two different classification approaches, a [Convolutional Neural Net](https://en.wikipedia.org/wiki/Convolutional_neural_network) and a [Logistic Regression classifier](https://en.wikipedia.org/wiki/Logistic_regression). We will compare performance on one genre and then extend to all of the genres in the IMDB dataset.
+
+### Dynamic Convolutional Neural Net
+The implementation used for this analysis is taken from this [great blog post](http://www.wildml.com/2015/12/implementing-a-cnn-for-text-classification-in-tensorflow/), which in turn is an implementation of [this algorithm](http://arxiv.org/abs/1408.5882). I recommend this [post](http://www.wildml.com/2015/11/understanding-convolutional-neural-networks-for-nlp/) for a good primer on convolutional neural networks for NLP tasks.
+
+The architecture of the network is shown below (image from [Denny Britz](http://www.wildml.com/2015/12/implementing-a-cnn-for-text-classification-in-tensorflow/) ):
+
+![no-alignment](/assets/images/dcnn_arch.png)
+
+The input data is a word-embedding vector of the movie review. I used the [Stanford GloVe dataset](https://nlp.stanford.edu/projects/glove/) of word vectors. In this sense our DCNN model is a transfer learning model -- we are taking the output of the pre-trained GloVe model and passing it through the DCNN. 
+
+After entering the neural net the data goes through a set of convolution, pooling, activation, folding, flattening and padding layers to ultimately produce a prediction vector for the genre-under-test.
+
+### Logistic Regression
+
+The other model we will consider is a traditional logistic regression model. This classifier maps the output score of a fitted log regression curve and assigns a class to the data based on an optimal threshold.
+
+The implementation used for this analysis is based on another nice blog post, this one by [Zac Stewart](http://zacstewart.com/2014/08/05/pipelines-of-featureunions-of-pipelines.html). Our pipeline is pretty straight-forward:
+
+```python
+pipeline = Pipeline([
+    ('vect', CountVectorizer(ngram_range=(1, 3))),
+    ('tf_idf', TfidfTransformer()),
+    ('clf', LogisticRegression(C=0.39810717055349731,
+                               class_weight=None)), ])
+```
+
+The first step in the pipeline vectorizes the comments into unigrams, bigrams and trigrams. Next, those vectors are [tf-idf](https://en.wikipedia.org/wiki/Tf%E2%80%93idf) transformed, which weights the counts produced by the vectorizer by frequency within, and outside of the movie review. Lastly, the log regression model is built off the vectors. The penalty weight, *C*, was derived offline.
 
 ## Performance Results
 
-Paragraphs are separated by a blank line.
+We are going to compare performance of the two approaches outlined above (the DCNN and Log Regression classifier) and then generalize to illustrate performance.
 
-2nd paragraph. *Italic*, **bold**, and `monospace`. Itemized lists
-look like:
+### Performance Comparision (The Bakeoff)
+Let's start by looking at classifier performance for "Action" movies in the IMDB dataset. As discussed above, there are 25,000 movie reviews in the training folder as organized by Stanford, and 25,000 movie reviews in the test set. Of these, 4,414 and 4,302 of the reviews are for Action movies (respectively).
 
-  * this one
-  * that one
-  * the other one
+We fit both models to the training data and then apply the models to the test data. We can compare performance from several different perspectives.
 
+The first comparison is to look at the different label scores that come out of the classifiers.
+
+![no-alignment](/assets/images/histogram_comparing_dcnn_logr.png)
+
+The classifiers distribute the genre scores much differently -- you can see that the neural net scores primarily live on the poles of scoring region (i.e., are either 0 or 1) while the regression classifier distributes the scores primarily across the lower half of the scoring region.
+
+A traditional next-step in evaluating classifier performance is to plot a Receiver-Operating-Curve (ROC) and measure the area under the curve. A ROC curve is generated by sweeping across a parameter of interest (in this case the threshold upon which a classifier score is used to determine the film to be an 'Action' movie) and measuring the resultant true and false positives that come from the classifier labels.
+
+![no-alignment](/assets/images/both_roc_curves.png)
+
+Interestingly, with respect to the ROC curves, the classifiers perform about the same <sup>[1](#myfootnote1)</sup>. The area-under-curve (AUC) for the two ROC curves is approximately the same. This also bears out if we report precision, recall and f1 for the different approaches (taken at the optimal f1 threshold for each classifier).
+
+| Measure     | DCNN | Log Regression |
+|-------------|------|----------------|
+| Threshold   | 0.7  | 0.22           |
+| Precision   | 0.48 | 0.49           |
+| Recall      | 0.56 | 0.58           |
+| F1          | 0.52 | 0.53           |
+
+Lastly, we can look at how many reviews the classifiers agree/disagree on.
+
+|            | Total       |Both Correct| DCNN Only  | LR Only | Both Wrong |
+|------------|-------------|------------|------------|---------|------------|
+|     Action | 4,302       | 1,983      | 432        | 511     | 1,376      |
+| Not-Action | 20,428      |16,509      | 1,303      | 1,325   | 1,291      |
+
+It's interesting that there so many reviews (nearly 25% of the Action movies) that the classifiers disagree on. Here's just one example (the 1998 movie "Shepherd". The DCNN correctly labeled it 'Action' while the LR classifier did not):
+> Shepherd (1998) If "B" movies, tired and corny scripts, and golf carts dressed up as some sort of futuristic mode of transport are your sort of entertainment, you'll probably enjoy this. Otherwise, forget it. The topless newsreader, though completely irrelevant, did give a few seconds of amusement.
+
+It's easy to imagine a classifier getting tripped up by this review -- there aren't many clues it's an Action movie.
+
+### Performance Across All Genres
+
+## Next Steps
+
+
+<a name="myfootnote1">1</a>: I am far from a neural net expert and I'm not trying to suggest that a log regression classifier is equal to the DCNN. I didn't even fully train the DCNN and am sure someone could tune it to have it outperform the regression approach.

@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="3.8.3">Jekyll</generator><link href="https://danfinkel.github.io/feed.xml" rel="self" type="application/atom+xml" /><link href="https://danfinkel.github.io/" rel="alternate" type="text/html" /><updated>2018-09-07T11:40:26-04:00</updated><id>https://danfinkel.github.io/</id><title type="html">Dan Finkel’s Data Science Page</title><subtitle>Data Science, Analytics and Engineering Code Log.</subtitle><author><name>Dan Finkel</name><email>dan.finkel@gmail.com</email><uri>github.com/danfinkel</uri></author><entry><title type="html">Determining Movie Genre from its Review</title><link href="https://danfinkel.github.io/ta/text_classification/" rel="alternate" type="text/html" title="Determining Movie Genre from its Review" /><published>2018-08-01T00:00:00-04:00</published><updated>2018-08-01T00:00:00-04:00</updated><id>https://danfinkel.github.io/ta/text_classification</id><content type="html" xml:base="https://danfinkel.github.io/ta/text_classification/">&lt;p&gt;Text analysis is a continously growing application of data science that has many practical applications. At SMG we used data science to enhance many of our text analytic services we provide for clients. We overhauled our sentiment classification processes, developed highly accurate detectors for significant TA occurances, prototyped trend detectors and forecasting models for text and built tools and processes to extract entity variants from our large datasets of survey comments.&lt;/p&gt;
+<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="3.8.3">Jekyll</generator><link href="https://danfinkel.github.io/feed.xml" rel="self" type="application/atom+xml" /><link href="https://danfinkel.github.io/" rel="alternate" type="text/html" /><updated>2018-09-13T17:47:24-04:00</updated><id>https://danfinkel.github.io/</id><title type="html">Dan Finkel’s Data Science Page</title><subtitle>Data Science, Analytics and Engineering Code Log.</subtitle><author><name>Dan Finkel</name><email>dan.finkel@gmail.com</email><uri>github.com/danfinkel</uri></author><entry><title type="html">Determining Movie Genre from its Review</title><link href="https://danfinkel.github.io/ta/text_classification/" rel="alternate" type="text/html" title="Determining Movie Genre from its Review" /><published>2018-08-01T00:00:00-04:00</published><updated>2018-08-01T00:00:00-04:00</updated><id>https://danfinkel.github.io/ta/text_classification</id><content type="html" xml:base="https://danfinkel.github.io/ta/text_classification/">&lt;p&gt;Text analysis is a continously growing application of data science that has many practical applications. At SMG we used data science to enhance many of our text analytic services we provide for clients. We overhauled our sentiment classification processes, developed highly accurate detectors for significant TA occurances, prototyped trend detectors and forecasting models for text and built tools and processes to extract entity variants from our large datasets of survey comments.&lt;/p&gt;
 
 &lt;p&gt;For this exercise let’s understand how much information about a movie genre is captured in review content. The code used to generate the content shown in this post can be found &lt;a href=&quot;https://github.com/danfinkel/python/tree/master/text_classification&quot;&gt;here&lt;/a&gt;.&lt;/p&gt;
 
@@ -151,15 +151,131 @@
 
 &lt;h2 id=&quot;building-an-nlp-classifier&quot;&gt;Building an NLP Classifier&lt;/h2&gt;
 
+&lt;p&gt;For this exercise we are going to look at the performance of binary classifiers, i.e., how well a classifier labels a movie with a given genre. This aligns well with the dataset since a movie can have multiple labels. For example, “Die Hard” is both an &lt;a href=&quot;https://www.imdb.com/title/tt0095016/&quot;&gt;Action and Thriller&lt;/a&gt;. A production-version design of this application could be a “bank” of binary classifiers, each one trying to determine if a given movie should be labeled with a specific genre.&lt;/p&gt;
+
+&lt;p&gt;To start lets consider two different classification approaches, a &lt;a href=&quot;https://en.wikipedia.org/wiki/Convolutional_neural_network&quot;&gt;Convolutional Neural Net&lt;/a&gt; and a &lt;a href=&quot;https://en.wikipedia.org/wiki/Logistic_regression&quot;&gt;Logistic Regression classifier&lt;/a&gt;. We will compare performance on one genre and then extend to all of the genres in the IMDB dataset.&lt;/p&gt;
+
+&lt;h3 id=&quot;dynamic-convolutional-neural-net&quot;&gt;Dynamic Convolutional Neural Net&lt;/h3&gt;
+&lt;p&gt;The implementation used for this analysis is taken from this &lt;a href=&quot;http://www.wildml.com/2015/12/implementing-a-cnn-for-text-classification-in-tensorflow/&quot;&gt;great blog post&lt;/a&gt;, which in turn is an implementation of &lt;a href=&quot;http://arxiv.org/abs/1408.5882&quot;&gt;this algorithm&lt;/a&gt;. I recommend this &lt;a href=&quot;http://www.wildml.com/2015/11/understanding-convolutional-neural-networks-for-nlp/&quot;&gt;post&lt;/a&gt; for a good primer on convolutional neural networks for NLP tasks.&lt;/p&gt;
+
+&lt;p&gt;The architecture of the network is shown below (image from &lt;a href=&quot;http://www.wildml.com/2015/12/implementing-a-cnn-for-text-classification-in-tensorflow/&quot;&gt;Denny Britz&lt;/a&gt; ):&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;/assets/images/dcnn_arch.png&quot; alt=&quot;no-alignment&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;The input data is a word-embedding vector of the movie review. I used the &lt;a href=&quot;https://nlp.stanford.edu/projects/glove/&quot;&gt;Stanford GloVe dataset&lt;/a&gt; of word vectors. In this sense our DCNN model is a transfer learning model – we are taking the output of the pre-trained GloVe model and passing it through the DCNN.&lt;/p&gt;
+
+&lt;p&gt;After entering the neural net the data goes through a set of convolution, pooling, activation, folding, flattening and padding layers to ultimately produce a prediction vector for the genre-under-test.&lt;/p&gt;
+
+&lt;h3 id=&quot;logistic-regression&quot;&gt;Logistic Regression&lt;/h3&gt;
+
+&lt;p&gt;The other model we will consider is a traditional logistic regression model. This classifier maps the output score of a fitted log regression curve and assigns a class to the data based on an optimal threshold.&lt;/p&gt;
+
+&lt;p&gt;The implementation used for this analysis is based on another nice blog post, this one by &lt;a href=&quot;http://zacstewart.com/2014/08/05/pipelines-of-featureunions-of-pipelines.html&quot;&gt;Zac Stewart&lt;/a&gt;. Our pipeline is pretty straight-forward:&lt;/p&gt;
+
+&lt;div class=&quot;language-python highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;n&quot;&gt;pipeline&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;Pipeline&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;([&lt;/span&gt;
+    &lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;'vect'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;CountVectorizer&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;ngram_range&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;1&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;3&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;))),&lt;/span&gt;
+    &lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;'tf_idf'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;TfidfTransformer&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;()),&lt;/span&gt;
+    &lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;'clf'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;LogisticRegression&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;C&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;mf&quot;&gt;0.39810717055349731&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;
+                               &lt;span class=&quot;n&quot;&gt;class_weight&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;bp&quot;&gt;None&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)),&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;])&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;The first step in the pipeline vectorizes the comments into unigrams, bigrams and trigrams. Next, those vectors are &lt;a href=&quot;https://en.wikipedia.org/wiki/Tf%E2%80%93idf&quot;&gt;tf-idf&lt;/a&gt; transformed, which weights the counts produced by the vectorizer by frequency within, and outside of the movie review. Lastly, the log regression model is built off the vectors. The penalty weight, &lt;em&gt;C&lt;/em&gt;, was derived offline.&lt;/p&gt;
+
 &lt;h2 id=&quot;performance-results&quot;&gt;Performance Results&lt;/h2&gt;
 
-&lt;p&gt;Paragraphs are separated by a blank line.&lt;/p&gt;
+&lt;p&gt;We are going to compare performance of the two approaches outlined above (the DCNN and Log Regression classifier) and then generalize to illustrate performance.&lt;/p&gt;
 
-&lt;p&gt;2nd paragraph. &lt;em&gt;Italic&lt;/em&gt;, &lt;strong&gt;bold&lt;/strong&gt;, and &lt;code class=&quot;highlighter-rouge&quot;&gt;monospace&lt;/code&gt;. Itemized lists
-look like:&lt;/p&gt;
+&lt;h3 id=&quot;performance-comparision-the-bakeoff&quot;&gt;Performance Comparision (The Bakeoff)&lt;/h3&gt;
+&lt;p&gt;Let’s start by looking at classifier performance for “Action” movies in the IMDB dataset. As discussed above, there are 25,000 movie reviews in the training folder as organized by Stanford, and 25,000 movie reviews in the test set. Of these, 4,414 and 4,302 of the reviews are for Action movies (respectively).&lt;/p&gt;
 
-&lt;ul&gt;
-  &lt;li&gt;this one&lt;/li&gt;
-  &lt;li&gt;that one&lt;/li&gt;
-  &lt;li&gt;the other one&lt;/li&gt;
-&lt;/ul&gt;</content><author><name>Dan Finkel</name><email>dan.finkel@gmail.com</email><uri>github.com/danfinkel</uri></author><category term="IMDB" /><category term="Text" /><summary type="html">Text analysis is a continously growing application of data science that has many practical applications. At SMG we used data science to enhance many of our text analytic services we provide for clients. We overhauled our sentiment classification processes, developed highly accurate detectors for significant TA occurances, prototyped trend detectors and forecasting models for text and built tools and processes to extract entity variants from our large datasets of survey comments.</summary></entry></feed>
+&lt;p&gt;We fit both models to the training data and then apply the models to the test data. We can compare performance from several different perspectives.&lt;/p&gt;
+
+&lt;p&gt;The first comparison is to look at the different label scores that come out of the classifiers.&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;/assets/images/histogram_comparing_dcnn_logr.png&quot; alt=&quot;no-alignment&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;The classifiers distribute the genre scores much differently – you can see that the neural net scores primarily live on the poles of scoring region (i.e., are either 0 or 1) while the regression classifier distributes the scores primarily across the lower half of the scoring region.&lt;/p&gt;
+
+&lt;p&gt;A traditional next-step in evaluating classifier performance is to plot a Receiver-Operating-Curve (ROC) and measure the area under the curve. A ROC curve is generated by sweeping across a parameter of interest (in this case the threshold upon which a classifier score is used to determine the film to be an ‘Action’ movie) and measuring the resultant true and false positives that come from the classifier labels.&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;/assets/images/both_roc_curves.png&quot; alt=&quot;no-alignment&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;Interestingly, with respect to the ROC curves, the classifiers perform about the same &lt;sup&gt;&lt;a href=&quot;#myfootnote1&quot;&gt;1&lt;/a&gt;&lt;/sup&gt;. The area-under-curve (AUC) for the two ROC curves is approximately the same. This also bears out if we report precision, recall and f1 for the different approaches (taken at the optimal f1 threshold for each classifier).&lt;/p&gt;
+
+&lt;table&gt;
+  &lt;thead&gt;
+    &lt;tr&gt;
+      &lt;th&gt;Measure&lt;/th&gt;
+      &lt;th&gt;DCNN&lt;/th&gt;
+      &lt;th&gt;Log Regression&lt;/th&gt;
+    &lt;/tr&gt;
+  &lt;/thead&gt;
+  &lt;tbody&gt;
+    &lt;tr&gt;
+      &lt;td&gt;Threshold&lt;/td&gt;
+      &lt;td&gt;0.7&lt;/td&gt;
+      &lt;td&gt;0.22&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+      &lt;td&gt;Precision&lt;/td&gt;
+      &lt;td&gt;0.48&lt;/td&gt;
+      &lt;td&gt;0.49&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+      &lt;td&gt;Recall&lt;/td&gt;
+      &lt;td&gt;0.56&lt;/td&gt;
+      &lt;td&gt;0.58&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+      &lt;td&gt;F1&lt;/td&gt;
+      &lt;td&gt;0.52&lt;/td&gt;
+      &lt;td&gt;0.53&lt;/td&gt;
+    &lt;/tr&gt;
+  &lt;/tbody&gt;
+&lt;/table&gt;
+
+&lt;p&gt;Lastly, we can look at how many reviews the classifiers agree/disagree on.&lt;/p&gt;
+
+&lt;table&gt;
+  &lt;thead&gt;
+    &lt;tr&gt;
+      &lt;th&gt; &lt;/th&gt;
+      &lt;th&gt;Total&lt;/th&gt;
+      &lt;th&gt;Both Correct&lt;/th&gt;
+      &lt;th&gt;DCNN Only&lt;/th&gt;
+      &lt;th&gt;LR Only&lt;/th&gt;
+      &lt;th&gt;Both Wrong&lt;/th&gt;
+    &lt;/tr&gt;
+  &lt;/thead&gt;
+  &lt;tbody&gt;
+    &lt;tr&gt;
+      &lt;td&gt;Action&lt;/td&gt;
+      &lt;td&gt;4,302&lt;/td&gt;
+      &lt;td&gt;1,983&lt;/td&gt;
+      &lt;td&gt;432&lt;/td&gt;
+      &lt;td&gt;511&lt;/td&gt;
+      &lt;td&gt;1,376&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+      &lt;td&gt;Not-Action&lt;/td&gt;
+      &lt;td&gt;20,428&lt;/td&gt;
+      &lt;td&gt;16,509&lt;/td&gt;
+      &lt;td&gt;1,303&lt;/td&gt;
+      &lt;td&gt;1,325&lt;/td&gt;
+      &lt;td&gt;1,291&lt;/td&gt;
+    &lt;/tr&gt;
+  &lt;/tbody&gt;
+&lt;/table&gt;
+
+&lt;p&gt;It’s interesting that there so many reviews (nearly 25% of the Action movies) that the classifiers disagree on. Here’s just one example (the 1998 movie “Shepherd”. The DCNN correctly labeled it ‘Action’ while the LR classifier did not):&lt;/p&gt;
+&lt;blockquote&gt;
+  &lt;p&gt;Shepherd (1998) If “B” movies, tired and corny scripts, and golf carts dressed up as some sort of futuristic mode of transport are your sort of entertainment, you’ll probably enjoy this. Otherwise, forget it. The topless newsreader, though completely irrelevant, did give a few seconds of amusement.&lt;/p&gt;
+&lt;/blockquote&gt;
+
+&lt;p&gt;It’s easy to imagine a classifier getting tripped up by this review – there aren’t many clues it’s an Action movie.&lt;/p&gt;
+
+&lt;h3 id=&quot;performance-across-all-genres&quot;&gt;Performance Across All Genres&lt;/h3&gt;
+
+&lt;h2 id=&quot;next-steps&quot;&gt;Next Steps&lt;/h2&gt;
+
+&lt;p&gt;&lt;a name=&quot;myfootnote1&quot;&gt;1&lt;/a&gt;: I am far from a neural net expert and I’m not trying to suggest that a log regression classifier is equal to the DCNN. I didn’t even fully train the DCNN and am sure someone could tune it to have it outperform the regression approach.&lt;/p&gt;</content><author><name>Dan Finkel</name><email>dan.finkel@gmail.com</email><uri>github.com/danfinkel</uri></author><category term="IMDB" /><category term="Text" /><summary type="html">Text analysis is a continously growing application of data science that has many practical applications. At SMG we used data science to enhance many of our text analytic services we provide for clients. We overhauled our sentiment classification processes, developed highly accurate detectors for significant TA occurances, prototyped trend detectors and forecasting models for text and built tools and processes to extract entity variants from our large datasets of survey comments.</summary></entry></feed>
